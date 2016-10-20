@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>GP diff app! :D</title>
+<script type="text/javascript" src="http://sandshrewz.github.io/diffapi.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript">
+function diff() {
+	var dmp = new diff_match_patch();
+	var input = $('#original:eq(0)').val();
+	var revised = $('#new:eq(0)').val();
+	var commentArray = [];
+	revised = revised.replace(/!@(.*?)@!/g, function(_,p1) {
+		commentArray.push(p1);
+		return '<$' + commentArray.length + '$>';
+	});
+	dmp.Diff_Timeout = parseFloat($('#timeout:eq(0)').val());
+	dmp.Diff_EditCost = parseFloat($('#editcost:eq(0)').val());
+	var d = dmp.diff_main(input, revised);
+	dmp.diff_cleanupEfficiency(d);
+	var dhtml = dmp.diff_prettyHtml(d);	
+	console.log(dhtml);
+	$('#output:eq(0)').html(diffy(dhtml, commentArray));
+}
+function diffy(dhtml, commentArray) {
+	//picks colors
+	var add_color = $('#addcolor:eq(0)').val();
+	add_color = add_color.toLowerCase();
+	var del_color =  $('#delcolor:eq(0)').val();
+	del_color = del_color.toLowerCase();
+
+	//bbcode
+	var bbcoded = dhtml;
+	bbcoded = bbcoded.replace(/\<del.*?\>/gi, '[color=' + del_color + '][b][s]');
+	bbcoded = bbcoded.replace(/\<\/del\>/gi, '[/s][/b][/color]');
+	bbcoded = bbcoded.replace(/\<ins.*?\>/gi, '[color=' + add_color + '][b]');
+	bbcoded = bbcoded.replace(/\<\/ins\>/gi, '[/b][/color]');
+	bbcoded = bbcoded.replace(/\<\/?span.*?\>/gi, '');
+	bbcoded = bbcoded.replace(/\&para\;\<br.*?>/gi, '\n');
+	bbcoded = bbcoded.replace(/&lt;\$(.*?)\$&gt;/g, function(_,p1) {
+		return '[color=black]' + commentArray[p1-1] + '[/color]';
+	});
+	$('#bbcode:eq(0)').val(bbcoded);
+	dhtml = dhtml.replace(/&lt;\$.*?\$&gt;/gi, '');
+	return dhtml;
+}
+</script>
+<style>
+textarea {
+	width: 30em;
+	height: 30em;
+	margin: 0 0.5em;
+}
+del {
+	color: red;
+	font-weight: bold;
+}
+ins {
+	color: green;
+	font-weight: bold;
+}
+body {
+	font: 13px Verdana, sans-serif;
+}
+.boxes {
+	float: left;
+	margin: 0 auto;
+}
+#container {
+	border: 3px solid  #6495ED;
+	display: inline-block;
+	-webkit-border-radius: 12px;
+	-moz-border-radius: 12px;
+	border-radius: 12px;
+	padding: 15px 15px;
+}
+h1 {
+	margin-top: 0px;
+	border-bottom: 1px solid  #6495ED;
+	padding: 0 0 .5em 0;
+	color: #483D8B;
+	text-align: left;
+}
+h2 {
+	color: #483D8B;
+	text-align: left;
+}
+.panel {
+	color: #483D8B;
+	font-weight: bold;
+	margin-left: 5px;
+	text-align: left;
+	clear: both;
+}
+#output {
+	width: 30em;
+	height: 30em;
+	margin: 0 0.5em;
+	overflow: auto;
+	text-align: left;
+}
+</style>
+</head>
+<body>
+
+<div style="text-align: center;">
+<div id="container">
+<h1>GP diff app! :D</h1>
+<div class="boxes">
+<h2>Original</h2>
+<textarea id="original"></textarea>
+</div>
+<div class="boxes">
+<h2>New</h2>
+<textarea id="new"></textarea>
+</div>
+<div class="panel">
+<input id="diffz" onclick="diff()" value="diff!" type="button"><br />
+Edit Cost: <input id="editcost" value="3" type="text" maxlength=5 size=3 ><br />
+Timeout: <input id="timeout" value="1" type="text" size=3 > 0 allows unlimited timeout.<br />
+
+Choose Addition Color: <select id="addcolor">
+	<option selected>Blue</option>
+	<option>Green</option>
+</select><br />
+Choose Deletion Color: <select id="delcolor">
+	<option selected>Red</option>
+	<option>Orange</option>
+	<option>Purple</option>
+</select>
+</div>
+<div class="boxes">
+<h2>Output</h2>
+<div id="output"></div>
+</div>
+<div>
+<h2>BBCode</h2>
+<textarea id="bbcode"></textarea>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+</body>
+</html>

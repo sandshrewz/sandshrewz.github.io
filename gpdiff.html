@@ -37,12 +37,12 @@ function diffy(dhtml, commentArray) {
 	bbcoded = bbcoded.replace(/\<\/ins\>/gi, '[/b][/color]');
 	bbcoded = bbcoded.replace(/\<\/?span.*?\>/gi, '');
 	bbcoded = bbcoded.replace(/\&para\;\<br.*?>/gi, '\n');
-	bbcoded = bbcoded.replace(/&lt;\$(.*?)\$&gt;/g, function(_,p1) {
+	bbcoded = bbcoded.replace(/\<\$(.*?)\$\>/g, function(_,p1) {
 		return '[color=black]' + commentArray[p1-1] + '[/color]';
 	});
 	bbcoded = bbcoded.replace(/\[color=.{3,6}\[b\]\[s\]\s\[\/s\]\[\/b\]\[\/color\]/gi, '');
 	$('#bbcode:eq(0)').val(bbcoded);
-	dhtml = dhtml.replace(/&lt;\$.*?\$&gt;/gi, '');
+	dhtml = dhtml.replace(/\<\$.*?\$\>/gi, '');
 	return dhtml;
 }
 </script>
